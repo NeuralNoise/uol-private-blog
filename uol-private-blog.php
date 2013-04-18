@@ -15,12 +15,7 @@ class uol_privacy
 {
 	public static function register()
 	{
-		if (self::is_sitewide()) {
-	        /* add menu to Network admin page */
-	        add_action('network_admin_menu', array('uol_privacy', 'addAdminMenu'));
-	    } else {
-	    	add_action('admin_menu', array('uol_privacy', 'addAdminMenu'));
-	    }
+		add_action('admin_menu', array('uol_privacy', 'addAdminMenu'));
 		add_action( 'wp', array('uol_privacy', 'force_member_login_init') );
 		
 	}
@@ -64,8 +59,7 @@ class uol_privacy
     public static function addAdminMenu()
     {
 		/* adjust capability according to activation status of plugin */
-		$cap = (self::is_sitewide())? 'manage_network_options': 'manage_options';
-    	add_submenu_page( 'settings.php', 'Privacy', 'Privacy', $cap, 'uol-privacy', array('uol_privacy', 'get_admin_page'));
+    	add_submenu_page( 'settings.php', 'Privacy', 'Privacy', 'manage_options', 'uol-privacy', array('uol_privacy', 'get_admin_page'));
     }
 
     /**
@@ -74,8 +68,7 @@ class uol_privacy
     public static function get_admin_page()
     {
         /* check that the user has the required capability */ 
-		$cap = (self::is_sitewide())? 'manage_network_options': 'manage_options';
-        if (!current_user_can($cap))
+        if (!current_user_can('manage_options'))
         {
             wp_die( __('You do not have sufficient permissions to access this page.') );
         }
@@ -87,7 +80,7 @@ class uol_privacy
 		        	$valid_ips = array();
 	    	    	foreach ($ips as $ip) {
 	    	    		$isValid = true;
-	    	    		/* make sure it is only numbers and dots */
+	    	    		/* make sure it is only numbers and dots, then trim */
 	    	    		$ip = trim(preg_replace('/[^0-9\.]*/', '', $ip), ". \t\n\r\0\x0B");
 	    	    		/* split into quads */
 	    	    		$quads = explode(".", $ip);
@@ -103,11 +96,7 @@ class uol_privacy
 	    	    	}
 	    	    	if (count($valid_ips)) {
 	    	    		$ipstr = implode("|", $valid_ips);
-	    	    		if (self::is_sitewide()) {
-	    	    			update_site_option('uol_privacy', $ipstr);
-	    	    		} else {
-	    	    			update_option('uol_privacy', $ipstr);
-	    	    		}
+	    	    		update_option('uol_privacy', $ipstr);
 	    	    	}
 	    	    }
 	    	}
@@ -125,15 +114,11 @@ class uol_privacy
     }
 
     /**
-	 * gets default plugin options
+	 * gets plugin option value, or returns the empty string
 	 */
     public static function get_option() 
     {
-    	if (self::is_sitewide()) {
-    		$option = get_site_option('uol_privacy');
-    	} else {
-    		$option = get_option('uol_privacy');
-    	}
+    	$option = get_option('uol_privacy');
     	if ($option === false) {
     		return '';
     	} else {

@@ -3,16 +3,4 @@ uol-private-blog
 
 Makes a blog private by limiting access to logged-in users, or users within a given IP range.
 
-		$ips = array(
-			"129.11",
-			"10.11.40",
-			"10.11.41",
-			"194.82.12",
-			"194.82.13",
-			"194.82.14",
-			"194.82.15",
-			"194.80.232",
-			"194.80.233",
-			"194.80.234",
-			"194.80.235"
-		);
+When activated, the plugin will restrict all access to logged-in users only, and will redirect any requests to the login page. In order to allow users see any pages on the blog without being logged in, IP addresses can be added to the plugin administration page. Either full IP addresses can be added to let in individual IPs, or parts can be added to block IP ranges.
