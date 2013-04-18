@@ -86,9 +86,13 @@ class uol_privacy
 	    	    		$quads = explode(".", $ip);
 	    	    		/* test each quad */
 	    	    		foreach ($quads as $quad) {
-	    	    			if (!preg_match('/(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/', $quad)) {
+	    	    			if (!preg_match('/^[0-9]{1,3}$/', $quad)) {
 	    	    				$isValid = false;
 	    	    			}
+	    	    		}
+	    	    		/* only allow four */
+	    	    		if (count($quads) > 4) {
+	    	    			$ip = implode(".", array_slice($quads, 0, 4));
 	    	    		}
 	    	    		if ($isValid) {
 	    	    			$valid_ips[] = $ip;
@@ -102,11 +106,11 @@ class uol_privacy
 	    	}
 	    }
 	    $ips = self::get_option();
-	    printf('<div class="wrap"><div id="icon-settings" class="icon32"></div><h2>%s</h2><form name="custom-login-page-settings-form" method="post" action="">', __('Privacy settings'));
+	    printf('<div class="wrap"><div id="icon-options-general" class="icon32"></div><h2>%s</h2><form method="post" action="">', __('Privacy settings'));
         printf('<input type="hidden" name="ip_allow_list" id="ip_allow_list" value="%s" />', wp_create_nonce('ip_allow_list_nonce'));
-        printf('<p>%s</p><p><textarea name="ip_allow_list" id="ip_allow_list">%s</textarea></p>', __('Input a list of IP addresses, separated by linebreaks, to allow onto the site without the user having to log in. Partial IP addresses are OK'), explode("|", $ips));
+        printf('<p>%s</p><p><textarea name="ip_list" id="ip_list" cols="60" rows="20">%s</textarea></p>', __('Input a list of IP addresses, separated by linebreaks, to allow onto the site without the user having to log in. Partial IP addresses are OK'), str_replace("|", "\n", $ips));
         printf('<p><input type="submit" name="submit" class="button-primary" value="%s" /></p></form></div>', __('Save Changes'));
-    }
+   }
 
     public static function is_sitewide()
     {
