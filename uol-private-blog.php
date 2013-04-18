@@ -1,22 +1,22 @@
 <?php
 /*
-Plugin Name: University of Leeds privacy plugin
-Plugin URI: http://www.pvac.leeds.ac.uk/
-Description: This plugin restricts access to a blog so you either have to be logged in or on the campus network in order to access it
+Plugin Name: Privacy plugin
+Plugin URI: http://essl-pvac.github.com/plugins/uol-privacy-plugin
+Description: This plugin restricts access to a blog so you either have to be logged in or you computer has an IP address in a (configurable) range
 Version: 1.0
-Author: Peter Edwards
+Author: Peter Edwards <p.l.edwards@leeds.ac.uk>
 */
 if (!class_exists("uol_privacy")) :
 /**
  * class to redirect users to the wordpress login page if they are either not logged in or 
- * not on the campus network
+ * not on a give IP network
  */
 class uol_privacy
 {
 	public static function register()
 	{
-		add_action('admin_menu', array('uol_privacy', 'addAdminMenu'));
-		add_action( 'wp', array('uol_privacy', 'force_member_login_init') );
+		add_action('admin_menu', array(__CLASS__, 'add_admin_menu'));
+		add_action( 'wp', array(__CLASS__, 'force_member_login_init') );
 		
 	}
 
@@ -54,12 +54,12 @@ class uol_privacy
 	}
 
 	/**
-	 * uses add_submenu_page to add a menu item to the Settings menu (on the network admin dashboard or the blog dashboard)
+	 * uses add_submenu_page to add a menu item to the Settings menu
 	 */
-    public static function addAdminMenu()
+    public static function add_admin_menu()
     {
 		/* adjust capability according to activation status of plugin */
-    	add_submenu_page( 'settings.php', 'Privacy', 'Privacy', 'manage_options', 'uol-privacy', array('uol_privacy', 'get_admin_page'));
+    	add_submenu_page( 'options-general.php', 'Privacy Settings', 'Privacy Settings', 'manage_options', 'uol-privacy', array(__CLASS__, 'get_admin_page'));
     }
 
     /**
@@ -96,7 +96,7 @@ class uol_privacy
 	    	    	}
 	    	    	if (count($valid_ips)) {
 	    	    		$ipstr = implode("|", $valid_ips);
-	    	    		update_option('uol_privacy', $ipstr);
+	    	    		update_option('uol-privacy', $ipstr);
 	    	    	}
 	    	    }
 	    	}
@@ -118,7 +118,7 @@ class uol_privacy
 	 */
     public static function get_option() 
     {
-    	$option = get_option('uol_privacy');
+    	$option = get_option('uol-privacy');
     	if ($option === false) {
     		return '';
     	} else {
