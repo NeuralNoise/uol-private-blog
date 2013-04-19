@@ -18,19 +18,20 @@ class uol_privacy
 	 */
 	public static function register()
 	{
-		/* add menu to Network admin */
-		add_action('network_admin_menu', array(__CLASS__, 'add_network_admin_menu'));
-		/* add menu to blog admin */
-		add_action('admin_menu', array(__CLASS__, 'add_blog_admin_menu'));
-		/* register plugin admin options */
-		add_action( 'admin_init', array(__CLASS__, 'register_plugin_options') );
-		/* permissions check */
-		add_action( 'wp', array(__CLASS__, 'force_member_login_init') );
-		/* i18n */
-		add_action('plugins_loaded', array(__CLASS__, 'load_text_domain'));
-		/* Use the admin_print_scripts action to add scripts for blog admin page */
-		add_action( 'admin_print_scripts', array(__CLASS__, 'admin_scripts') );
-		
+		if (is_multisite()) {
+			/* add menu to Network admin */
+			add_action('network_admin_menu', array(__CLASS__, 'add_network_admin_menu'));
+			/* add menu to blog admin */
+			add_action('admin_menu', array(__CLASS__, 'add_blog_admin_menu'));
+			/* register plugin admin options */
+			add_action( 'admin_init', array(__CLASS__, 'register_plugin_options') );
+			/* permissions check */
+			add_action( 'wp', array(__CLASS__, 'force_member_login_init') );
+			/* i18n */
+			add_action('plugins_loaded', array(__CLASS__, 'load_text_domain'));
+			/* Use the admin_print_scripts action to add scripts for blog admin page */
+			add_action( 'admin_print_scripts', array(__CLASS__, 'admin_scripts') );
+		}		
 	}
 
 	/**
@@ -176,6 +177,7 @@ class uol_privacy
 		do_settings_sections('uol-privacy-options');
 		printf('<p><input type="submit" class="button-primary" name="submit" value="%s" /></p>', __('Save Changes', 'uol-privacy'));
 		print('</form>');
+		printf("<script>var uol_allowed_ips='%s';</script>", self::get_network_options());
 		print('</div>');
 	}
 
