@@ -1,7 +1,7 @@
 uol-private-blog
 ================
 
-This plugin restricts access to a blog on a multisite network so you have to be logged in to view pages. You can also configure a set of IP addresses or ranges to match client IP addresses if you want to restrict access by IP. As it is trivial to spoof an IP address, this plugin should not be used as in this way to make it private, rather to discourage search engines from indexing it.
+This plugin restricts access to a blog on a multisite network so you have to be logged in to view pages. You can also configure a set of IP addresses or ranges to match client IP addresses if you want to allow access by IP. As it is trivial to spoof an IP address, this plugin should not be used as in this way to make it private, rather to discourage search engines from indexing it.
 
 The plugin should be Network activated on a Multisite Wordpress installation.
 
