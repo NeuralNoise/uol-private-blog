@@ -5,7 +5,7 @@ This plugin restricts access to a blog on a multisite network so you have to be 
 
 The plugin should be Network activated on a Multisite Wordpress installation.
 
-### IP address filtering
+### Network Settings
 
 A list of allowed IP addresses can be added to the Privacy Settings page on the Network Dashboard (under Settings). Full IP addresses or partial IP addresses are allowed here, and are added to a text box, one per line. If the setting is enabled on the blog, client IP addresses are pattern-matched against the stored list, and if one of the allowed IP addresses or IP address fragments matches the start of the client IP address, the site is accessible by the client (without login).
 
