@@ -2,7 +2,7 @@
  * script for privacy plugin
  */
 jQuery(document).ready(function($){
-	var has_ips = (typeOf uol_allowed_ips !== 'undefined' && uol_allowed_ips !== '');
+	var has_ips = (typeof uol_allowed_ips !== 'undefined' && uol_allowed_ips !== '');
 	if (has_ips) {
 		if (!$('#uol_privacy_options-logged_in_users_only:checked').length) {
 			$('#uol_privacy_options-allow_network_users').prop('checked', false);
