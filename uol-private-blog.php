@@ -46,7 +46,7 @@ class uol_privacy
 	 * function which forces user to log in to see the site, or restricts
 	 * access by IP address, according to blog and network settings
 	 */
-	function force_member_login_init() 
+	public static function force_member_login_init() 
 	{
 		$blog_options = self::get_blog_options();
 
@@ -184,7 +184,7 @@ class uol_privacy
 	/**
 	 * registers settings and sections
 	 */
-	function register_plugin_options()
+	public static function register_plugin_options()
 	{
 		/* register a setting */
 		register_setting(
