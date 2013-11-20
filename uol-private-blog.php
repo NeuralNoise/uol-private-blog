@@ -21,12 +21,20 @@ class uol_privacy
 		if (is_multisite()) {
 			/* add menu to Network admin */
 			add_action('network_admin_menu', array(__CLASS__, 'add_network_admin_menu'));
-			/* add menu to blog admin */
-			add_action('admin_menu', array(__CLASS__, 'add_blog_admin_menu'));
-			/* register plugin admin options */
-			add_action( 'admin_init', array(__CLASS__, 'register_plugin_options') );
-			/* permissions check */
-			add_action( 'wp', array(__CLASS__, 'force_member_login_init') );
+			/* see if logins are required at network level */
+			$force_login = get_site_option('uol-privacy-force-login');
+			
+			/* if logins are forced on all sites, check permissions for all users */
+			if ($force_login) {
+				add_action( 'wp', array(__CLASS__, 'force_all_members_login_init') );
+			} else {
+				/* otherwise, present options to individual blogs */
+				add_action('admin_menu', array(__CLASS__, 'add_blog_admin_menu'));
+				/* register plugin admin options */
+				add_action( 'admin_init', array(__CLASS__, 'register_plugin_options') );
+				/* permissions check */
+				add_action( 'wp', array(__CLASS__, 'force_member_login_init') );
+			}
 			/* i18n */
 			add_action('plugins_loaded', array(__CLASS__, 'load_text_domain'));
 			/* Use the admin_print_scripts action to add scripts for blog admin page */
@@ -89,6 +97,29 @@ class uol_privacy
 	}
 
 	/**
+	 * function which forces all users to log in to see any site on the network
+	 */
+	public static function force_all_members_login_init() 
+	{
+		/* If the user is logged in, then abort */
+		if ( current_user_can('read') ) return;
+
+		/* This is an array of pages that will be EXCLUDED from being blocked */
+		$exclusions = array(
+			'wp-login.php',
+			'wp-cron.php', // Just incase
+			'wp-trackback.php',
+			'xmlrpc.php'
+		);
+
+		/* If the current script name is in the exclusion list, abort */
+		if ( in_array( basename($_SERVER['PHP_SELF']), $exclusions) ) return;
+
+		/* Still here? Okay, then redirect to the login form */
+		auth_redirect();
+	}
+
+	/**
 	 * uses add_submenu_page to add a menu item to the Network Settings menu
 	 */
 	public static function add_network_admin_menu()
@@ -118,6 +149,7 @@ class uol_privacy
 		}
 
 		$ips = self::get_network_options();
+		$force_login = get_site_option('uol-privacy-force-login');
 
 		/* save options */
 		if (isset($_POST["ip_allow_list"]) && wp_verify_nonce( $_POST['ip_allow_list'], 'ip_allow_list_nonce' )) {
@@ -154,10 +186,14 @@ class uol_privacy
 			}
 			update_site_option('uol-privacy-network', $new_ips);
 			$ips = $new_ips;
+			$force_login = isset($_POST["force_login"]);
+			update_site_option('uol-privacy-force-login', $force_login);
 		}
 		printf('<div class="wrap"><div id="icon-options-general" class="icon32"></div><h2>%s</h2><form method="post" action="">', __('Privacy settings', 'uol-privacy'));
 		printf('<input type="hidden" name="ip_allow_list" id="ip_allow_list" value="%s" />', wp_create_nonce('ip_allow_list_nonce'));
-		printf('<p>%s</p><p><textarea name="ip_list" id="ip_list" cols="60" rows="20">%s</textarea></p>', __('Input a list of IP addresses, separated by linebreaks, to allow onto the site without the user having to log in. Partial IP addresses are OK', 'uol-privacy'), str_replace("|", "\n", $ips));
+		$chckd = $force_login? ' checked="checked"': '';
+		printf('<p><label for="force_login"><input type="checkbox" name="force_login" id="force_login"%s /> %s</label><p>', $chckd, __('Check this box to force login on all sites on the network', 'uol-privacy'));
+		printf('<div id="ip_list_entry"><p>%s</p><p><textarea name="ip_list" id="ip_list" cols="60" rows="20">%s</textarea></p></div>', __('Input a list of IP addresses, separated by linebreaks, to allow onto the site without the user having to log in. Partial IP addresses are OK', 'uol-privacy'), str_replace("|", "\n", $ips));
 		printf('<p><input type="submit" name="submit" class="button-primary" value="%s" /></p></form></div>', __('Save Changes', 'uol-privacy'));
 	}
 

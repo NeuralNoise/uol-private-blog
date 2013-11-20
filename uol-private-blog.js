@@ -20,4 +20,14 @@ jQuery(document).ready(function($){
 		$('#uol_privacy_options-allow_network_users').prop('checked', false);
 		$('#uol_privacy_options-allow_network_users').parents('tr').hide();
 	}
+	function ip_entry_box_toggle()
+	{
+		if ($('#force_login:checked').length) {
+			$('#ip_list_entry').hide();
+		} else {
+			$('#ip_list_entry').show();
+		}
+	}
+	$('#force_login').on('click', ip_entry_box_toggle);
+	ip_entry_box_toggle();
 });
